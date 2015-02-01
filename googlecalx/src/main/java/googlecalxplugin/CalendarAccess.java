@@ -31,7 +31,6 @@ import com.google.api.services.calendar.model.Event.Reminders;
 import com.google.api.services.calendar.model.EventDateTime;
 import com.google.api.services.calendar.model.EventReminder;
 
-import de.engehausen.tvbrowser.CalAccess;
 import devplugin.Program;
 
 /**
@@ -146,7 +145,7 @@ public class CalendarAccess {
 	 */
 	protected Calendar getCalendar() throws IOException {
 		if (client == null) {
-			final ZipInputStream zis = new ZipInputStream(CalAccess.class.getResourceAsStream("/googlecalxplugin/json"));
+			final ZipInputStream zis = new ZipInputStream(CalendarAccess.class.getResourceAsStream("/googlecalxplugin/json"));
 			if (0xb0b61cc5L != zis.getNextEntry().getCrc()) {
 				throw new IllegalStateException();
 			}
