@@ -4,6 +4,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.WeakHashMap;
 
+import devplugin.Program;
+import devplugin.ProgramFieldType;
 import util.settings.PropertyBasedSettings;
 
 /**
@@ -12,10 +14,11 @@ import util.settings.PropertyBasedSettings;
 public class GoogleCalXSettings extends PropertyBasedSettings {
 	
 	private static final String PROP_CALENDAR_ID = "calendarId";
-	private static final String PROP_USE_DEFAULTS = "defaults";
 	private static final String PROP_NOTIFICATION_TIME = "ntime";
 	private static final String PROP_NOTIFICATION_TYPE = "ntype";
 	private static final String PROP_NOTIFICATION_COLOR = "ncolor";
+	private static final String PROP_NOTIFICATION_TITLE = "ntitle";
+	private static final String PROP_NOTIFICATION_BODY = "nbody";
 	
 	private final Map<String, CalendarColor> colorCache = new WeakHashMap<String, CalendarColor>();
 
@@ -44,24 +47,6 @@ public class GoogleCalXSettings extends PropertyBasedSettings {
 	}
 
 	/**
-	 * Indicates whether or not to use the calendar defaults
-	 * when creating events.
-	 * @return <code>true</code> if defaults are to be used
-	 */
-	public boolean getUseDefaults() {
-		boolean result = Boolean.parseBoolean(get(PROP_USE_DEFAULTS, Boolean.toString(true)));
-		return result;
-	}
-
-	/**
-	 * Sets whether or not to use defaults for event creation in the calendar.
-	 * @param flag <code>true</code> to use defaults.
-	 */
-	public void setUseDefaults(final boolean flag) {
-		set(PROP_USE_DEFAULTS, Boolean.toString(flag));
-	}
-
-	/**
 	 * Returns the type of notification to use for event creation in the calendar.
 	 * @return the type of notification to use for event creation.
 	 */
@@ -77,6 +62,45 @@ public class GoogleCalXSettings extends PropertyBasedSettings {
 		if (type != null) {
 			set(PROP_NOTIFICATION_TYPE, type.name());
 		}
+	}
+
+	/**
+	 * Returns the notification title. May include place holders, see {@link #setNotificationTitle(String)}.
+	 * @return the notification title, never <code>null</code>
+	 */
+	public String getNotificationTitle() {
+		return get(PROP_NOTIFICATION_TITLE, "{channel.name}: {title}");
+	}
+
+	/**
+	 * Sets the notification title. May use place holders in curly
+	 * braces; these are accessed as bean properties of the {@link Program}.
+	 * Special case: Text-based {@link ProgramFieldType} fields - these
+	 * are no bean properties and can be directly accessed using the type name.
+	 * @param title the title to set, must not be <code>null</code>
+	 */
+	public void setNotificationTitle(final String title) {
+		set(PROP_NOTIFICATION_TITLE, title);
+	}
+
+	/**
+	 * Returns the notification body. May include place holders, see {@link #setNotificationTitle(String)}.
+	 * Recommended values: <code>{shortInfo}</code> or <code>{description}</code>.
+	 * @return the notification body, never <code>null</code>
+	 */
+	public String getNotificationBody() {
+		return get(PROP_NOTIFICATION_BODY, "{shortInfo}");
+	}
+
+	/**
+	 * Sets the notification title. May use place holders in curly
+	 * braces; these are accessed as bean properties of the {@link Program}.
+	 * Special case: Text-based {@link ProgramFieldType} fields - these
+	 * are no bean properties and can be directly accessed using the type name.
+	 * @param body the body to set, must not be <code>null</code>
+	 */
+	public void setNotificationBody(final String body) {
+		set(PROP_NOTIFICATION_BODY, body);
 	}
 
 	/**

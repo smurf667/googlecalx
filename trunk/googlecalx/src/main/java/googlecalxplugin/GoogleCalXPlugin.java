@@ -17,9 +17,11 @@ import javax.swing.SwingUtilities;
 import util.exc.ErrorHandler;
 import util.ui.Localizer;
 import devplugin.ActionMenu;
+import devplugin.Marker;
 import devplugin.Plugin;
 import devplugin.PluginInfo;
 import devplugin.Program;
+import devplugin.ProgramReceiveTarget;
 import devplugin.SettingsTab;
 import devplugin.ThemeIcon;
 import devplugin.Version;
@@ -29,16 +31,17 @@ import devplugin.Version;
  */
 public class GoogleCalXPlugin extends Plugin {
 
-	private static Version VERSION;// = new Version(1,0);
+	private static Version VERSION;
 
 	protected static final String MSG_PLUGIN_NAME = "pluginName";
 	protected static final String MSG_PLUGIN_DESCRIPTION = "description";
 	protected static final String MSG_EXPORT_TEXT = "exportText";
 	protected static final String MSG_CALENDAR_ID = "calendarId";
-	protected static final String MSG_USE_DEFAULTS = "useDefaults";
 	protected static final String MSG_NO_CALENDAR = "noCalendar";
 	protected static final String MSG_NOTIFICATION_TIME = "notificationTime";
 	protected static final String MSG_NOTIFICATION_TYPE = "notificationType";
+	protected static final String MSG_NOTIFICATION_TITLE = "notificationTitle";
+	protected static final String MSG_NOTIFICATION_BODY = "notificationBody";
 	protected static final String MSG_SETTINGS = "settings";
 	protected static final String MSG_ERROR = "svcError";
 	protected static final String MSG_SUCCESS = "success";
@@ -49,6 +52,7 @@ public class GoogleCalXPlugin extends Plugin {
 	protected static final String MSG_EXAMPLE = "example";
 	protected static final String MSG_NOTIFICATION_COLOR = "notificationColor";
 	protected static final String MSG_CHOOSE_COLOR = "chooseColor";
+	protected static final String MSG_UNMARK = "unmark";
 	
 	private static final Localizer localizer = Localizer.getLocalizerFor(GoogleCalXPlugin.class);
 	private static PluginInfo pluginInfo;
@@ -56,6 +60,7 @@ public class GoogleCalXPlugin extends Plugin {
 	
 	private final Map<Program, ExportAction> actionsCache;
 	private final ImageIcon exportIcon;
+	private final ProgramReceiveTarget exportReceiveTarget;
 	protected GoogleCalXSettings settings;
 	protected CalendarAccess calendarAccess;
 
@@ -66,22 +71,28 @@ public class GoogleCalXPlugin extends Plugin {
 	public static Version getVersion() {
 		if (VERSION == null) {
 			final Properties props = new Properties();
+			int[] vs = { 0, 0, 0 };
+			boolean stable = false;
 			try {
 				props.load(GoogleCalXPlugin.class.getResourceAsStream("/META-INF/maven/de.engehausen/googlecalx/pom.properties"));
 				final String pomVersion = props.getProperty("version");
 				final StringTokenizer tok = new StringTokenizer(pomVersion, ".");
-				final int major = Integer.parseInt(tok.nextToken());
-				String suffix = tok.nextToken();
-				final int cut = suffix.indexOf('-');
-				if (cut > 0) {
-					suffix = suffix.substring(0, cut);
+				int i = 0;
+				while (i < 3 && tok.hasMoreTokens()) {
+					final String str = tok.nextToken();
+					final int cut = str.indexOf('-');
+					if (cut > 0) {
+						vs[i++] = Integer.parseInt(str.substring(0, cut));
+						stable = !pomVersion.contains("SNAPSHOT");
+						break;
+					} else {
+						vs[i++] = Integer.parseInt(str);
+					}
 				}
-				final int minor = Integer.parseInt(suffix);
-				final boolean stable = !pomVersion.contains("SNAPSHOT");
-				VERSION = new Version(major, minor, stable);
 			} catch (IOException e) {
-				VERSION = new Version(0, 0, false);
+				stable = false;
 			}
+			VERSION = new Version(vs[0], vs[1], vs[2], stable);
 		}
 		return VERSION;
 	}
@@ -93,6 +104,7 @@ public class GoogleCalXPlugin extends Plugin {
 		super();
 		actionsCache = new WeakHashMap<Program, ExportAction>();
 		exportIcon = createImageIcon("apps", "office-calendar");
+		exportReceiveTarget = new ProgramReceiveTarget(this, localizer.msg(MSG_PLUGIN_NAME, "Google calendar export"), "googleCalX");
 	}
 	
 	/**
@@ -123,28 +135,56 @@ public class GoogleCalXPlugin extends Plugin {
 	 */
 	@Override
 	public ActionMenu getContextMenuActions(final Program program) {
-		Action action = actionsCache.get(program);
-		if (action == null) {
-			final String calendarId = settings.getCalendarId();
-			if (calendarId != null && calendarId.contains("@")) {
-				final ExportAction export = new ExportAction(program, calendarId, this);
-				export.putValue(Action.SMALL_ICON, exportIcon);
-				actionsCache.put(program, export);
-				action = export;
-			} else {
-				action = new AbstractAction(localizer.msg(MSG_NO_CALENDAR, "Export to Google Calendar...")) {
-					private static final long serialVersionUID = 666L;
-					@Override
-					public void actionPerformed(final ActionEvent e) {
-						JOptionPane.showMessageDialog(getParentFrame(), localizer.msg(MSG_SET_CALENDAR, "Please set your calendar in the settings"), localizer.msg(MSG_CONFIGURE, "Please configure"), JOptionPane.INFORMATION_MESSAGE);
-					}
-				};
+		if (isMarkedByPlugin(program)) {
+			final GoogleCalXPlugin plugin = this;
+			return new ActionMenu(new AbstractAction(localizer.msg(MSG_UNMARK, "Unmark Google Calendar export"), exportIcon) {
+				private static final long serialVersionUID = 1L;
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					program.unmark(plugin);
+				}
+			});
+		} else {
+			Action action = actionsCache.get(program);
+			if (action == null) {
+				final String calendarId = settings.getCalendarId();
+				if (calendarId != null && calendarId.contains("@")) {
+					final ExportAction export = new ExportAction(program, calendarId, this);
+					export.putValue(Action.SMALL_ICON, exportIcon);
+					actionsCache.put(program, export);
+					action = export;
+				} else {
+					action = new AbstractAction(localizer.msg(MSG_NO_CALENDAR, "Export to Google Calendar...")) {
+						private static final long serialVersionUID = 666L;
+						@Override
+						public void actionPerformed(final ActionEvent e) {
+							JOptionPane.showMessageDialog(getParentFrame(), localizer.msg(MSG_SET_CALENDAR, "Please set your calendar in the settings"), localizer.msg(MSG_CONFIGURE, "Please configure"), JOptionPane.INFORMATION_MESSAGE);
+						}
+					};
+				}
 			}
+			return new ActionMenu(action);
 		}
-		return new ActionMenu(action);
 	}
 
-	
+	/**
+	 * Checks whether the program was marked by this plugin.
+	 * @param program the program to check, must not be <code>null</code>.
+	 * @return <code>true</code> if the program was marked by the plugin, <code>false</code> otherwise.
+	 */
+	protected boolean isMarkedByPlugin(final Program program) {
+		final Marker[] markers = program.getMarkerArr();
+		if (markers != null) {
+			final String id = getId();
+			for (Marker marker : markers) {
+				if (id.equals(marker.getId())) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -177,6 +217,40 @@ public class GoogleCalXPlugin extends Plugin {
 		} catch (GeneralSecurityException e) {
 			throw new IllegalStateException(e);
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean canReceiveProgramsWithTarget() {
+		return true;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean receivePrograms(final Program[] programArr, final ProgramReceiveTarget receiveTarget) {
+		if (programArr != null && programArr.length > 0 && exportReceiveTarget.equals(receiveTarget)) {
+			for (Program program : programArr) {
+				try {
+					calendarAccess.addEvent(
+						calendarAccess.createEvent(program)
+					);
+					program.mark(this);
+				} catch (IOException ex) {
+					ErrorHandler.handle(localizer.msg(MSG_ERROR, "Service call error"), ex);
+				}
+			}
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public ProgramReceiveTarget[] getProgramReceiveTargets() {
+		return new ProgramReceiveTarget[] { exportReceiveTarget };
 	}
 
 	/**

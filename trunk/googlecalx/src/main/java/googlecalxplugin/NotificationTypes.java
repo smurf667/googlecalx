@@ -5,6 +5,10 @@ package googlecalxplugin;
  */
 public enum NotificationTypes {
 	
+	/** calendar defaults */
+	defaults,
+	/** none */
+	none,
 	/** popup reminder */
 	popup,
 	/** reminder by e-mail */
