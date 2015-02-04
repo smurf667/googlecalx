@@ -12,7 +12,6 @@ import java.util.Map;
 
 import javax.swing.Icon;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -40,8 +39,9 @@ public class GoogleCalXPreferences implements SettingsTab, ActionListener {
 	private final Icon icon;
 	private JTextField fieldCalendarId;
 	private JTextField fieldNotificationTime;
+	private JTextField fieldNotificationTitle;
+	private JTextField fieldNotificationBody;
 	private JComboBox<NotificationTypes> fieldNotificationType;
-	private JCheckBox fieldUseDefaults;
 	private JButton pickNotificationColor;
 	private NotificationColor notificationColor;
 
@@ -79,24 +79,28 @@ public class GoogleCalXPreferences implements SettingsTab, ActionListener {
 		pb.addRow();
 		pb.addLabel(localizer.msg(GoogleCalXPlugin.MSG_CALENDAR_ID, "Calendar ID (eMail)") + ':', cc.xy(2, pb.getRow()));
 		pb.add(fieldCalendarId, cc.xyw(4, pb.getRow(), pb.getColumnCount() - 3));
-		
-		fieldUseDefaults = new JCheckBox();
-		fieldUseDefaults.setSelected(settings.getUseDefaults());
-		fieldUseDefaults.addActionListener(this);
+
+		fieldNotificationTitle = new JTextField(settings.getNotificationTitle());
 		pb.addRow();
-		pb.addLabel(localizer.msg(GoogleCalXPlugin.MSG_USE_DEFAULTS, "Use defaults") + ':', cc.xy(2, pb.getRow()));
-		pb.add(fieldUseDefaults, cc.xyw(4, pb.getRow(), pb.getColumnCount() - 3));
+		pb.addLabel(localizer.msg(GoogleCalXPlugin.MSG_NOTIFICATION_TITLE, "Notification title") + ':', cc.xy(2, pb.getRow()));
+		pb.add(fieldNotificationTitle, cc.xyw(4, pb.getRow(), pb.getColumnCount() - 3));
+
+		fieldNotificationBody = new JTextField(settings.getNotificationBody());
+		pb.addRow();
+		pb.addLabel(localizer.msg(GoogleCalXPlugin.MSG_NOTIFICATION_BODY, "Notification body") + ':', cc.xy(2, pb.getRow()));
+		pb.add(fieldNotificationBody, cc.xyw(4, pb.getRow(), pb.getColumnCount() - 3));
+
+		fieldNotificationType = new JComboBox<NotificationTypes>(NotificationTypes.values());
+		fieldNotificationType.setSelectedItem(settings.getNotificationType());
+		fieldNotificationType.addActionListener(this);
+		pb.addRow();
+		pb.addLabel(localizer.msg(GoogleCalXPlugin.MSG_NOTIFICATION_TYPE, "Notification type") + ':', cc.xy(2, pb.getRow()));
+		pb.add(fieldNotificationType, cc.xyw(4, pb.getRow(), pb.getColumnCount() - 3));
 
 		fieldNotificationTime = new JTextField(settings.getNotificationTime());
 		pb.addRow();
 		pb.addLabel(localizer.msg(GoogleCalXPlugin.MSG_NOTIFICATION_TIME, "Notification time (minutes)") + ':', cc.xy(2, pb.getRow()));
 		pb.add(fieldNotificationTime, cc.xyw(4, pb.getRow(), pb.getColumnCount() - 3));
-
-		fieldNotificationType = new JComboBox<NotificationTypes>(NotificationTypes.values());
-		fieldNotificationType.setSelectedItem(settings.getNotificationType());
-		pb.addRow();
-		pb.addLabel(localizer.msg(GoogleCalXPlugin.MSG_NOTIFICATION_TYPE, "Notification type") + ':', cc.xy(2, pb.getRow()));
-		pb.add(fieldNotificationType, cc.xyw(4, pb.getRow(), pb.getColumnCount() - 3));
 		
 		pickNotificationColor = new JButton(localizer.msg(GoogleCalXPlugin.MSG_SELECT, "select"));
 		pickNotificationColor.addActionListener(this);
@@ -108,7 +112,7 @@ public class GoogleCalXPreferences implements SettingsTab, ActionListener {
 		temp.add(pickNotificationColor);
 		pb.add(temp, cc.xyw(4, pb.getRow(), pb.getColumnCount() - 3));
 
-		handleDependencies(!fieldUseDefaults.isSelected());
+		handleDependencies();
 
 		return pb.getPanel();
 	}
@@ -135,9 +139,10 @@ public class GoogleCalXPreferences implements SettingsTab, ActionListener {
 	@Override
 	public void saveSettings() {
 		settings.setCalendarId(fieldCalendarId.getText());
-		settings.setUseDefaults(fieldUseDefaults.isSelected());
-		settings.setNotificationTime(fieldNotificationTime.getText());
+		settings.setNotificationTitle(fieldNotificationTitle.getText());
+		settings.setNotificationBody(fieldNotificationBody.getText());
 		settings.setNotificationType((NotificationTypes) fieldNotificationType.getSelectedItem());
+		settings.setNotificationTime(fieldNotificationTime.getText());
 		settings.setNotificationColor(notificationColor.getColor());
 	}
 
@@ -147,8 +152,8 @@ public class GoogleCalXPreferences implements SettingsTab, ActionListener {
 	@Override
 	public void actionPerformed(final ActionEvent e) {
 		final Object source = e.getSource();
-		if (source == fieldUseDefaults) {
-			handleDependencies(!fieldUseDefaults.isSelected());
+		if (source == fieldNotificationType) {
+			handleDependencies();
 		} else if (source == pickNotificationColor) {
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
@@ -168,13 +173,14 @@ public class GoogleCalXPreferences implements SettingsTab, ActionListener {
 	}
 
 	/**
-	 * Enables or disables components dependent on wether "use defaults" is
-	 * selected or not.
-	 * @param flag the state of "use defaults" (<code>false</code> means "use defaults" is active)
+	 * Enables or disables components dependent on whether custom notifications should be used.
 	 */
-	protected void handleDependencies(final boolean flag) {
+	protected void handleDependencies() {
+		final Object selected = fieldNotificationType.getSelectedItem();
+		final boolean flag = 
+				!(NotificationTypes.none.equals(selected) ||
+				NotificationTypes.defaults.equals(selected));
 		fieldNotificationTime.setEnabled(flag);
-		fieldNotificationType.setEnabled(flag);
 		pickNotificationColor.setEnabled(flag);
 		notificationColor.setEnabled(flag);
 	}

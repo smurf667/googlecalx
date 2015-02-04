@@ -3,13 +3,20 @@ package googlecalxplugin;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.ZipInputStream;
+
+import org.apache.commons.beanutils.BeanUtils;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
@@ -32,6 +39,7 @@ import com.google.api.services.calendar.model.EventDateTime;
 import com.google.api.services.calendar.model.EventReminder;
 
 import devplugin.Program;
+import devplugin.ProgramFieldType;
 
 /**
  * Google Calendar access.
@@ -39,11 +47,30 @@ import devplugin.Program;
 public class CalendarAccess {
 
 	private static final String STR_ENTER = "Enter";
+	private static final Map<String, ProgramFieldType> STR2PFT;
+	private static final Pattern PLACEHOLDER = Pattern.compile("\\{([A-Za-z_.]+?)\\}");
+	
 	private Calendar client;
 	private final GoogleCalXSettings settings;
 	private final HttpTransport httpTransport;
 	private final JsonFactory jsonFactory;
 	private final FileDataStoreFactory fileDataStoreFactory;
+
+	static {
+		final Map<String, ProgramFieldType> result = new HashMap<String, ProgramFieldType>();
+		for (Field field : ProgramFieldType.class.getFields()) {
+			try {
+				final Object value = field.get(null);
+				if (value  instanceof ProgramFieldType) {
+					result.put(field.getName(), (ProgramFieldType) value);
+				}
+			} catch (IllegalAccessException e) {
+				// ignore field
+			}
+		}
+		STR2PFT = Collections.unmodifiableMap(result);
+	}
+
 
 	/**
 	 * Creates the accessor.
@@ -101,26 +128,29 @@ public class CalendarAccess {
 	 */
 	public Event createEvent(final Program program) {
 		final Event event = new Event();
-		event.setSummary(program.getChannel().getName()+": "+program.getTitle());
-		String desc = program.getShortInfo();
-		if (desc == null) {
-			desc = program.getDescription();
-		}
-		if (desc != null) {
-			event.setDescription(desc);
-		}
-		if (!settings.getUseDefaults()) {
-			final Reminders reminders = new Reminders();
+		event.setSummary(resolve(program, settings.getNotificationTitle()));
+		event.setDescription(resolve(program, settings.getNotificationBody()));
+		final NotificationTypes notificationType = settings.getNotificationType();
+		final Reminders reminders = new Reminders();
+		if (!NotificationTypes.none.equals(notificationType)) {
+			if (NotificationTypes.defaults.equals(notificationType)) {
+				reminders.setUseDefault(Boolean.TRUE);
+			} else {
+				reminders.setUseDefault(Boolean.FALSE);
+				final EventReminder r = new EventReminder();
+				r.setMinutes(Integer.valueOf(settings.getNotificationTime()));
+				r.setMethod(settings.getNotificationType().name());
+				reminders.setOverrides(Collections.singletonList(r));
+				event.setColorId(settings.getNotificationColor().getId());
+			}
+		} else {
+			// no reminders at all
 			reminders.setUseDefault(Boolean.FALSE);
-			final EventReminder r = new EventReminder();
-			r.setMinutes(Integer.valueOf(settings.getNotificationTime()));
-			r.setMethod(settings.getNotificationType().name());
-			reminders.setOverrides(Collections.singletonList(r));
-			event.setReminders(reminders);
-			event.setColorId(settings.getNotificationColor().getId());
 		}
-		// TODO seems there's a time offset problem for me for UK data (GMT+1 vs. UTC?)
-		final TimeZone timeZone = program.getChannel().getTimeZone();
+		event.setReminders(reminders);
+		// TODO seems there's a time offset problem for me for UK data (GMT+1 vs. UTC?) - should I use local time zone always?
+		//final TimeZone timeZone = program.getChannel().getTimeZone();
+		final TimeZone timeZone = TimeZone.getDefault();
 		final devplugin.Date programDate = program.getDate();
 		final java.util.Calendar jcal = java.util.Calendar.getInstance(timeZone);
 		jcal.setTimeInMillis(0);
@@ -172,6 +202,62 @@ public class CalendarAccess {
 			}
 		}
 		return client;
+	}
+
+	/**
+	 * Returns a string with all placeholders of the given template resolved.
+	 * @param program the program to access properties of, must not be <code>null</code>.
+	 * @param template the template with placeholders in curly braces
+	 * @return the resolved string
+	 */
+	protected String resolve(final Program program, final String template) {
+		if (template.indexOf('{') < 0) {
+			return template;
+		}
+		final StringBuilder sb = new StringBuilder(128);
+		final Matcher matchPattern = PLACEHOLDER.matcher(template);
+
+		int last = 0;
+		while (matchPattern.find(last)) {
+			final int next = matchPattern.end();
+			if (next > last) {
+				sb.append(template.substring(last, matchPattern.start()));
+			}
+			final String key = matchPattern.group(1);
+			if (key.endsWith("_TYPE")) {
+				final ProgramFieldType type = STR2PFT.get(key);
+				if (type != null) {
+					if (type.isRightFormat(ProgramFieldType.TEXT_FORMAT)) {
+						final String str = program.getTextField(type);
+						if (str != null) {
+							sb.append(str);
+						}
+					} else {
+						sb.append(key);
+					}
+				} else {
+					sb.append(key);
+				}
+			} else {
+				try {
+					final String value = BeanUtils.getNestedProperty(program, key);
+					if (value != null) {
+						sb.append(value);
+					}
+				} catch (IllegalAccessException e) {
+					sb.append(key);
+				} catch (InvocationTargetException e) {
+					sb.append(key);
+				} catch (NoSuchMethodException e) {
+					sb.append(key);
+				}
+			}
+			last = next;
+		}
+		if (last < template.length()) {
+			sb.append(template.substring(last));
+		}
+		return sb.toString();
 	}
 
 }
