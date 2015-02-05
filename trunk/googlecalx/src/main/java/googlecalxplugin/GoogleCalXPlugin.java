@@ -230,15 +230,17 @@ public class GoogleCalXPlugin extends Plugin {
 	 * {@inheritDoc}
 	 */
 	public boolean receivePrograms(final Program[] programArr, final ProgramReceiveTarget receiveTarget) {
-		if (programArr != null && programArr.length > 0 && exportReceiveTarget.equals(receiveTarget)) {
-			for (Program program : programArr) {
-				try {
-					calendarAccess.addEvent(
-						calendarAccess.createEvent(program)
-					);
-					program.mark(this);
-				} catch (IOException ex) {
-					ErrorHandler.handle(localizer.msg(MSG_ERROR, "Service call error"), ex);
+		if (exportReceiveTarget.equals(receiveTarget)) {
+			if (programArr != null) {
+				for (Program program : programArr) {
+					try {
+						calendarAccess.addEvent(
+							calendarAccess.createEvent(program)
+						);
+						program.mark(this);
+					} catch (IOException ex) {
+						ErrorHandler.handle(localizer.msg(MSG_ERROR, "Service call error"), ex);
+					}
 				}
 			}
 			return true;
