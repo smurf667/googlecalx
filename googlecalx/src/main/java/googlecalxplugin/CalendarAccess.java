@@ -148,7 +148,7 @@ public class CalendarAccess {
 			reminders.setUseDefault(Boolean.FALSE);
 		}
 		event.setReminders(reminders);
-		// TODO seems there's a time offset problem for me for UK data (GMT+1 vs. UTC?) - should I use local time zone always?
+		// seems there's a time offset problem for me for UK data (GMT+1 vs. UTC?) - should I use local time zone always?
 		//final TimeZone timeZone = program.getChannel().getTimeZone();
 		final TimeZone timeZone = TimeZone.getDefault();
 		final devplugin.Date programDate = program.getDate();
