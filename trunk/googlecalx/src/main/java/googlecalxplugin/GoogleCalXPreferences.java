@@ -12,6 +12,7 @@ import java.util.Map;
 
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -33,11 +34,12 @@ import devplugin.SettingsTab;
 public class GoogleCalXPreferences implements SettingsTab, ActionListener {
 
 	private final Component parent;
-	private final GoogleCalXSettings settings;
+	private final GoogleCalXPlugin plugin;
 	private final CalendarAccess calendarAccess;
 	private final Localizer localizer;
 	private final Icon icon;
 	private JTextField fieldCalendarId;
+	private JCheckBox fieldShowCalendarId;
 	private JTextField fieldNotificationTime;
 	private JTextField fieldNotificationTitle;
 	private JTextField fieldNotificationBody;
@@ -46,16 +48,16 @@ public class GoogleCalXPreferences implements SettingsTab, ActionListener {
 	private NotificationColor notificationColor;
 
 	/**
-	 * Creates the preferences view (settings tab).
+	 * Creates the preferences view (plugin.settings tab).
 	 * @param comp the parent component (frame), must not be <code>null</code>.
-	 * @param aSettings the plugin settings, must not be <code>null</code>.
+	 * @param aPlugin the plugin holding the plugin.settings, must not be <code>null</code>.
 	 * @param anAccess the calendar accessor, must not be <code>null</code>.
 	 * @param aLocalizer the localizer for messages, must not be <code>null</code>.
 	 * @param anIcon an icon; may be <code>null</code>
 	 */
-	public GoogleCalXPreferences(final Component comp, final GoogleCalXSettings aSettings, final CalendarAccess anAccess, final Localizer aLocalizer, final Icon anIcon) {
+	public GoogleCalXPreferences(final Component comp, final GoogleCalXPlugin aPlugin, final CalendarAccess anAccess, final Localizer aLocalizer, final Icon anIcon) {
 		parent = comp;
-		settings = aSettings;
+		plugin = aPlugin;
 		calendarAccess = anAccess;
 		localizer = aLocalizer;
 		icon = anIcon;
@@ -74,30 +76,35 @@ public class GoogleCalXPreferences implements SettingsTab, ActionListener {
 						+ FormSpecs.RELATED_GAP_COLSPEC.encode() + ","
 						+ FormSpecs.PREF_COLSPEC.encode());
 		final CellConstraints cc = new CellConstraints();
-
-		fieldCalendarId = new JTextField(settings.getCalendarId());
+		
+		fieldCalendarId = new JTextField(plugin.settings.getCalendarId());
 		pb.addRow();
 		pb.addLabel(localizer.msg(GoogleCalXPlugin.MSG_CALENDAR_ID, "Calendar ID (eMail)") + ':', cc.xy(2, pb.getRow()));
 		pb.add(fieldCalendarId, cc.xyw(4, pb.getRow(), pb.getColumnCount() - 3));
+		fieldShowCalendarId = new JCheckBox();
+		fieldShowCalendarId.setSelected(plugin.settings.getShowCalendarId());
+		pb.addRow();
+		pb.addLabel(localizer.msg(GoogleCalXPlugin.MSG_SHOW_CALENDAR_ID, "Show ID in export action") + ':', cc.xy(2, pb.getRow()));
+		pb.add(fieldShowCalendarId, cc.xyw(4, pb.getRow(), pb.getColumnCount() - 3));
 
-		fieldNotificationTitle = new JTextField(settings.getNotificationTitle());
+		fieldNotificationTitle = new JTextField(plugin.settings.getNotificationTitle());
 		pb.addRow();
 		pb.addLabel(localizer.msg(GoogleCalXPlugin.MSG_NOTIFICATION_TITLE, "Notification title") + ':', cc.xy(2, pb.getRow()));
 		pb.add(fieldNotificationTitle, cc.xyw(4, pb.getRow(), pb.getColumnCount() - 3));
 
-		fieldNotificationBody = new JTextField(settings.getNotificationBody());
+		fieldNotificationBody = new JTextField(plugin.settings.getNotificationBody());
 		pb.addRow();
 		pb.addLabel(localizer.msg(GoogleCalXPlugin.MSG_NOTIFICATION_BODY, "Notification body") + ':', cc.xy(2, pb.getRow()));
 		pb.add(fieldNotificationBody, cc.xyw(4, pb.getRow(), pb.getColumnCount() - 3));
 
 		fieldNotificationType = new JComboBox<NotificationTypes>(NotificationTypes.values());
-		fieldNotificationType.setSelectedItem(settings.getNotificationType());
+		fieldNotificationType.setSelectedItem(plugin.settings.getNotificationType());
 		fieldNotificationType.addActionListener(this);
 		pb.addRow();
 		pb.addLabel(localizer.msg(GoogleCalXPlugin.MSG_NOTIFICATION_TYPE, "Notification type") + ':', cc.xy(2, pb.getRow()));
 		pb.add(fieldNotificationType, cc.xyw(4, pb.getRow(), pb.getColumnCount() - 3));
 
-		fieldNotificationTime = new JTextField(settings.getNotificationTime());
+		fieldNotificationTime = new JTextField(plugin.settings.getNotificationTime());
 		pb.addRow();
 		pb.addLabel(localizer.msg(GoogleCalXPlugin.MSG_NOTIFICATION_TIME, "Notification time (minutes)") + ':', cc.xy(2, pb.getRow()));
 		pb.add(fieldNotificationTime, cc.xyw(4, pb.getRow(), pb.getColumnCount() - 3));
@@ -106,7 +113,7 @@ public class GoogleCalXPreferences implements SettingsTab, ActionListener {
 		pickNotificationColor.addActionListener(this);
 		pb.addRow();
 		pb.addLabel(localizer.msg(GoogleCalXPlugin.MSG_NOTIFICATION_COLOR, "Notification color") + ':', cc.xy(2, pb.getRow()));
-		notificationColor = new NotificationColor(localizer.msg(GoogleCalXPlugin.MSG_EXAMPLE, "example"), settings.getNotificationColor());
+		notificationColor = new NotificationColor(localizer.msg(GoogleCalXPlugin.MSG_EXAMPLE, "example"), plugin.settings.getNotificationColor());
 		final JPanel temp = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		temp.add(notificationColor);
 		temp.add(pickNotificationColor);
@@ -138,12 +145,14 @@ public class GoogleCalXPreferences implements SettingsTab, ActionListener {
 	 */
 	@Override
 	public void saveSettings() {
-		settings.setCalendarId(fieldCalendarId.getText());
-		settings.setNotificationTitle(fieldNotificationTitle.getText());
-		settings.setNotificationBody(fieldNotificationBody.getText());
-		settings.setNotificationType((NotificationTypes) fieldNotificationType.getSelectedItem());
-		settings.setNotificationTime(fieldNotificationTime.getText());
-		settings.setNotificationColor(notificationColor.getColor());
+		plugin.settings.setCalendarId(fieldCalendarId.getText());
+		plugin.settings.setShowCalendarId(fieldShowCalendarId.isSelected());
+		plugin.settings.setNotificationTitle(fieldNotificationTitle.getText());
+		plugin.settings.setNotificationBody(fieldNotificationBody.getText());
+		plugin.settings.setNotificationType((NotificationTypes) fieldNotificationType.getSelectedItem());
+		plugin.settings.setNotificationTime(fieldNotificationTime.getText());
+		plugin.settings.setNotificationColor(notificationColor.getColor());
+		plugin.resetActionsCache();
 	}
 
 	/**
