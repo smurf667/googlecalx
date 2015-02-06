@@ -14,6 +14,7 @@ import util.settings.PropertyBasedSettings;
 public class GoogleCalXSettings extends PropertyBasedSettings {
 	
 	private static final String PROP_CALENDAR_ID = "calendarId";
+	private static final String PROP_SHOW_CALENDAR_ID = "idInContextMenu";
 	private static final String PROP_NOTIFICATION_TIME = "ntime";
 	private static final String PROP_NOTIFICATION_TYPE = "ntype";
 	private static final String PROP_NOTIFICATION_COLOR = "ncolor";
@@ -44,6 +45,24 @@ public class GoogleCalXSettings extends PropertyBasedSettings {
 	 */
 	public void setCalendarId(final String id) {
 		set(PROP_CALENDAR_ID, id);
+	}
+
+	/**
+	 * Indicates whether or not to show the calendar ID in the
+	 * context menu export action text.
+	 * @return <code>true</code> if the calendar ID is to be shown.
+	 */
+	public boolean getShowCalendarId() {
+		return Boolean.parseBoolean(get(PROP_SHOW_CALENDAR_ID, Boolean.toString(true)));
+	}
+
+	/**
+	 * Sets whether or not to show the calendar ID in the
+	 * context menu export action text.
+	 * @param flag <code>true</code> to show the calendar ID in the action text.
+	 */
+	public void setShowCalendarId(final boolean flag) {
+		set(PROP_SHOW_CALENDAR_ID, Boolean.toString(flag));
 	}
 
 	/**

@@ -5,7 +5,7 @@
 	<groupId>de.engehausen</groupId>
 	<artifactId>googlecalx</artifactId>
 	<packaging>jar</packaging>
-	<version>1.0.1-SNAPSHOT</version>
+	<version>1.0.2-SNAPSHOT</version>
 	<name>googlecalx</name>
 	<url>http://code.google.com/p/googlecalx/</url>
 	<description>Plugin for TV-Browser (http://www.tvbrowser.org/) to export programs to Google Calendar.</description>

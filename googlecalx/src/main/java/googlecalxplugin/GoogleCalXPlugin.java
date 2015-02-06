@@ -37,6 +37,7 @@ public class GoogleCalXPlugin extends Plugin {
 	protected static final String MSG_PLUGIN_DESCRIPTION = "description";
 	protected static final String MSG_EXPORT_TEXT = "exportText";
 	protected static final String MSG_CALENDAR_ID = "calendarId";
+	protected static final String MSG_SHOW_CALENDAR_ID = "showCalendarId";
 	protected static final String MSG_NO_CALENDAR = "noCalendar";
 	protected static final String MSG_NOTIFICATION_TIME = "notificationTime";
 	protected static final String MSG_NOTIFICATION_TYPE = "notificationType";
@@ -117,7 +118,9 @@ public class GoogleCalXPlugin extends Plugin {
 					GoogleCalXPlugin.class, 
 					localizer.msg(MSG_PLUGIN_NAME, "Google calendar export"),
 					localizer.msg(MSG_PLUGIN_DESCRIPTION, "Exports a program into your Google calendar."), 
-					"Jan Engehausen, smurf667@gmail.com");
+					"Jan Engehausen, smurf667@gmail.com",
+					"Apache License, Version 2.0",
+					"https://code.google.com/p/googlecalx/wiki/SettingsHowTo");
 		}
 		return pluginInfo;
 	}
@@ -168,6 +171,14 @@ public class GoogleCalXPlugin extends Plugin {
 	}
 
 	/**
+	 * Clears the actions cache. Can be invoked e.g. when
+	 * preferences change.
+	 */
+	protected void resetActionsCache() {
+		actionsCache.clear();
+	}
+
+	/**
 	 * Checks whether the program was marked by this plugin.
 	 * @param program the program to check, must not be <code>null</code>.
 	 * @return <code>true</code> if the program was marked by the plugin, <code>false</code> otherwise.
@@ -190,7 +201,7 @@ public class GoogleCalXPlugin extends Plugin {
 	 */
 	@Override
 	public SettingsTab getSettingsTab() {
-		return new GoogleCalXPreferences(getParentFrame(), settings, calendarAccess, localizer, createImageIcon("apps", "office-calendar", 16));
+		return new GoogleCalXPreferences(getParentFrame(), this, calendarAccess, localizer, createImageIcon("apps", "office-calendar", 16));
 	}
 
 	/**
@@ -266,7 +277,7 @@ public class GoogleCalXPlugin extends Plugin {
 		private final GoogleCalXPlugin plugin;
 		
 		protected ExportAction(final Program prog, final String calId, final GoogleCalXPlugin parent) {
-			super(localizer.msg(MSG_EXPORT_TEXT, "Export to {0}", calId));
+			super(parent.settings.getShowCalendarId()?localizer.msg(MSG_EXPORT_TEXT, "Export to {0}", calId):localizer.msg(MSG_NO_CALENDAR, "Export to Google Calendar..."));
 			program = prog;
 			plugin = parent;
 		}
