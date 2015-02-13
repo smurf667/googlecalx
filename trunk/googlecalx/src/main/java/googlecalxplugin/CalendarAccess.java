@@ -97,6 +97,24 @@ public class CalendarAccess {
 		jsonFactory = factory!=null?factory:JacksonFactory.getDefaultInstance();
 		httpTransport = GoogleNetHttpTransport.newTrustedTransport();
 	}
+	
+	/**
+	 * Deletes all files from the data store directory.
+	 */
+	public void deleteCredentials() {
+		final File directory = fileDataStoreFactory.getDataDirectory();
+		boolean deleted = false;
+		if (directory != null) {
+			for (File file : directory.listFiles()) {
+				if (file.isFile()) {
+					deleted |= file.delete();
+				}
+			}
+		}
+		if (deleted) {
+			client = null;
+		}
+	}
 
 	/**
 	 * Inserts the given event into the calendar. The calendar ID supplied by

@@ -14,7 +14,9 @@ import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
@@ -45,6 +47,7 @@ public class GoogleCalXPreferences implements SettingsTab, ActionListener {
 	private JTextField fieldNotificationBody;
 	private JComboBox<NotificationTypes> fieldNotificationType;
 	private JButton pickNotificationColor;
+	private JButton clearCredentials;
 	private NotificationColor notificationColor;
 
 	/**
@@ -119,6 +122,15 @@ public class GoogleCalXPreferences implements SettingsTab, ActionListener {
 		temp.add(pickNotificationColor);
 		pb.add(temp, cc.xyw(4, pb.getRow(), pb.getColumnCount() - 3));
 
+		pb.addRow();
+		pb.add(new JSeparator(), cc.xyw(4, pb.getRow(), pb.getColumnCount() - 3));
+
+		clearCredentials = new JButton(localizer.msg(GoogleCalXPlugin.MSG_CLEAR_CREDENTIALS, "clear"));
+		clearCredentials.addActionListener(this);
+		pb.addRow();
+		pb.addLabel(localizer.msg(GoogleCalXPlugin.MSG_CREDENTIALS, "Calender credentials") + ':', cc.xy(2, pb.getRow()));
+		pb.add(clearCredentials, cc.xyw(4, pb.getRow(), pb.getColumnCount() - 3));
+
 		handleDependencies();
 
 		return pb.getPanel();
@@ -163,6 +175,10 @@ public class GoogleCalXPreferences implements SettingsTab, ActionListener {
 		final Object source = e.getSource();
 		if (source == fieldNotificationType) {
 			handleDependencies();
+		} else if (source == clearCredentials) {
+			if (JOptionPane.showConfirmDialog(parent, localizer.msg(GoogleCalXPlugin.MSG_R_U_SURE, "Are you sure?"), localizer.msg(GoogleCalXPlugin.MSG_CLEAR_CREDENTIALS, "clear"), JOptionPane.YES_NO_OPTION) == JOptionPane.OK_OPTION) {
+				calendarAccess.deleteCredentials();
+			}
 		} else if (source == pickNotificationColor) {
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {

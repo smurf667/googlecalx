@@ -54,6 +54,9 @@ public class GoogleCalXPlugin extends Plugin {
 	protected static final String MSG_NOTIFICATION_COLOR = "notificationColor";
 	protected static final String MSG_CHOOSE_COLOR = "chooseColor";
 	protected static final String MSG_UNMARK = "unmark";
+	protected static final String MSG_CLEAR_CREDENTIALS = "clearCreds";
+	protected static final String MSG_CREDENTIALS = "creds";
+	protected static final String MSG_R_U_SURE = "sure";
 	
 	private static final Localizer localizer = Localizer.getLocalizerFor(GoogleCalXPlugin.class);
 	private static PluginInfo pluginInfo;
