@@ -178,7 +178,8 @@ public class CalendarAccess {
 		jcal.set(java.util.Calendar.HOUR_OF_DAY, program.getHours());
 		jcal.set(java.util.Calendar.MINUTE, program.getMinutes());
 		final Date startDate = jcal.getTime();
-		final Date endDate = new Date(startDate.getTime() + program.getLength()*60L*1000L);
+		final long minutes = Math.max(1L, program.getLength());
+		final Date endDate = new Date(startDate.getTime() + minutes*60L*1000L);
 		final DateTime start = new DateTime(startDate, timeZone);
 		event.setStart(new EventDateTime().setDateTime(start));
 		final DateTime end = new DateTime(endDate, timeZone);
