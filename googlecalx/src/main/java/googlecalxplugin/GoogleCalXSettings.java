@@ -14,6 +14,7 @@ import util.settings.PropertyBasedSettings;
 public class GoogleCalXSettings extends PropertyBasedSettings {
 	
 	private static final String PROP_CALENDAR_ID = "calendarId";
+	private static final String PROP_CALENDAR_TARGET = "calendarTarget";
 	private static final String PROP_SHOW_CALENDAR_ID = "idInContextMenu";
 	private static final String PROP_NOTIFICATION_TIME = "ntime";
 	private static final String PROP_NOTIFICATION_TYPE = "ntype";
@@ -33,7 +34,7 @@ public class GoogleCalXSettings extends PropertyBasedSettings {
 
 	/**
 	 * Returns the calendar ID.
-	 * @return the calendar ID, may be <code>null</codeY.
+	 * @return the calendar ID, may be <code>null</code>.
 	 */
 	public String getCalendarId() {
 		return get(PROP_CALENDAR_ID);
@@ -45,6 +46,24 @@ public class GoogleCalXSettings extends PropertyBasedSettings {
 	 */
 	public void setCalendarId(final String id) {
 		set(PROP_CALENDAR_ID, id);
+	}
+
+	/**
+	 * Returns the calendar target to export to.
+	 * @return the calendar target to export to, may be <code>null</code>.
+	 */
+	public CalendarTarget getCalendarTarget() {
+		return CalendarTarget.parse(get(PROP_CALENDAR_TARGET));
+	}
+
+	/**
+	 * Sets the calendar target to export to.
+	 * @param aTarget the calendar target to export to, must not be <code>null</code>.
+	 */
+	public void setCalendarTarget(final CalendarTarget aTarget) {
+		if (aTarget != null) {
+			set(PROP_CALENDAR_TARGET, aTarget.toStringRep());
+		}
 	}
 
 	/**

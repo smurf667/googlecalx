@@ -37,6 +37,7 @@ public class GoogleCalXPlugin extends Plugin {
 	protected static final String MSG_PLUGIN_DESCRIPTION = "description";
 	protected static final String MSG_EXPORT_TEXT = "exportText";
 	protected static final String MSG_CALENDAR_ID = "calendarId";
+	protected static final String MSG_CALENDAR_TARGET = "exportTarget";
 	protected static final String MSG_SHOW_CALENDAR_ID = "showCalendarId";
 	protected static final String MSG_NO_CALENDAR = "noCalendar";
 	protected static final String MSG_NOTIFICATION_TIME = "notificationTime";
@@ -53,6 +54,7 @@ public class GoogleCalXPlugin extends Plugin {
 	protected static final String MSG_EXAMPLE = "example";
 	protected static final String MSG_NOTIFICATION_COLOR = "notificationColor";
 	protected static final String MSG_CHOOSE_COLOR = "chooseColor";
+	protected static final String MSG_CHOOSE_CALENDAR = "chooseCalendar";
 	protected static final String MSG_UNMARK = "unmark";
 	protected static final String MSG_CLEAR_CREDENTIALS = "clearCreds";
 	protected static final String MSG_CREDENTIALS = "creds";
@@ -154,8 +156,8 @@ public class GoogleCalXPlugin extends Plugin {
 			Action action = actionsCache.get(program);
 			if (action == null) {
 				final String calendarId = settings.getCalendarId();
-				if (calendarId != null && calendarId.contains("@")) {
-					final ExportAction export = new ExportAction(program, calendarId, this);
+				if (calendarId != null && calendarId.indexOf('@') > 0) {
+					final ExportAction export = new ExportAction(program, this);
 					export.putValue(Action.SMALL_ICON, exportIcon);
 					actionsCache.put(program, export);
 					action = export;
@@ -279,8 +281,8 @@ public class GoogleCalXPlugin extends Plugin {
 		private final Program program;
 		private final GoogleCalXPlugin plugin;
 		
-		protected ExportAction(final Program prog, final String calId, final GoogleCalXPlugin parent) {
-			super(parent.settings.getShowCalendarId()?localizer.msg(MSG_EXPORT_TEXT, "Export to {0}", calId):localizer.msg(MSG_NO_CALENDAR, "Export to Google Calendar..."));
+		protected ExportAction(final Program prog, final GoogleCalXPlugin parent) {
+			super(getLabel(parent.settings));
 			program = prog;
 			plugin = parent;
 		}
@@ -304,6 +306,25 @@ public class GoogleCalXPlugin extends Plugin {
 				});
 			}
 		}
-		
+
+		/**
+		 * Returns the text for the export action.
+		 * @param settings the settings of the plugin, must not be <code>null</code>.
+		 * @return the display label for the export action.
+		 */
+		private static String getLabel(final GoogleCalXSettings settings) {
+			if (settings.getShowCalendarId()) {
+				String label = null;
+				final CalendarTarget target = settings.getCalendarTarget();
+				if (target != null) {
+					label = target.getLabel();
+				}
+				if (label == null || label.isEmpty()) {
+					label = settings.getCalendarId();
+				}
+				return localizer.msg(MSG_EXPORT_TEXT, "Export to {0}", label);
+			}
+			return localizer.msg(MSG_NO_CALENDAR, "Export to Google Calendar...");
+		}
 	}
 }

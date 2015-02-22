@@ -6,9 +6,11 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
@@ -31,6 +33,8 @@ import com.google.api.client.util.DateTime;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.CalendarScopes;
+import com.google.api.services.calendar.model.CalendarList;
+import com.google.api.services.calendar.model.CalendarListEntry;
 import com.google.api.services.calendar.model.ColorDefinition;
 import com.google.api.services.calendar.model.Colors;
 import com.google.api.services.calendar.model.Event;
@@ -117,14 +121,42 @@ public class CalendarAccess {
 	}
 
 	/**
+	 * Lists the calendars that can be used to add events to.
+	 * @return a list with possible calendar export targets, never <code>null</code>
+	 * @throws IOException in case of error
+	 */
+	public List<CalendarTarget> getCalendarTargets() throws IOException {
+		final List<CalendarTarget> result = new ArrayList<CalendarTarget>();
+		String pageToken = null;
+		do {
+			final CalendarList calendarList = getCalendar().calendarList().list().setPageToken(pageToken).execute();
+			final List<CalendarListEntry> items = calendarList.getItems();
+			for (CalendarListEntry calendarListEntry : items) {
+				result.add(new CalendarTarget(calendarListEntry.getId(), calendarListEntry.getSummary()));
+			}
+			pageToken = calendarList.getNextPageToken();
+		} while (pageToken != null);
+		return result;
+	}
+	
+	/**
 	 * Inserts the given event into the calendar. The calendar ID supplied by
+	 * {@link GoogleCalXSettings#getCalendarTarget()} is used if set, otherwise
 	 * {@link GoogleCalXSettings#getCalendarId()} is used.
 	 * @param event the event to insert into the calendar, must not be <code>null</code>
 	 * @return the inserted event
 	 * @throws IOException in case of error
 	 */
 	public Event addEvent(final Event event) throws IOException {
-		return getCalendar().events().insert(settings.getCalendarId(), event).execute();
+		final CalendarTarget target = settings.getCalendarTarget();
+		String id = null;
+		if (target != null) {
+			id = target.getId();
+		}
+		if (id == null || id.length() == 0) {
+			id = settings.getCalendarId();
+		}
+		return getCalendar().events().insert(id, event).execute();
 	}
 
 	/**
