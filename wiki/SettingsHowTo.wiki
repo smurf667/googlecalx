@@ -8,9 +8,9 @@ You can access the plugin settings by selecting "Tools > Manage plugins..." from
 = Configuration =
 
 == Setting your calendar ==
-Before you can export to your calendar, you have to specify your "Calendar ID". Typically, you would use your Google Mail e-Mail address. If you have other calendars, you need to find out the exact ID on the settings page for that calendar. Details can be found at [http://hilfe.tvbrowser.org/viewtopic.php?f=42&t=17003&hilit=calendar+export&start=75] (in German).
+Before you can export to your calendar, you have to specify your "Calendar ID". Typically, you would use your Google Mail e-Mail address. If you have other calendars, you can pick the export target calendar once you've set your main calendar ID.
 
-Once you have configured your "Calendar ID" you can right-click a program and export it into this calendar.
+Once you have configured the settings you can right-click a program and export it into the calendar. If you do not wish to see the name of the calendar into which the program is exported, simply uncheck "show ID in export action".
 
 == Setting title and body of the exported entry ==
 The title and body of the exported entry are taken from the TV-Browser program information. You can use placeholders in curly brackets to access the properties of the program. Examples:
