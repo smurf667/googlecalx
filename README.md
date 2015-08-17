@@ -29,13 +29,13 @@ The title and body of the exported entry are taken from the TV-Browser program i
  * `{shortInfo}` - returns a summary of the program
  * `{channel.name}` - returns the name of the channel this program is broadcast on
 
-You can find details on the properties of a program at http://tvbrowser.org:8080/hudson/job/tvbrowser-3-unstable/javadoc/devplugin/Program.html
+You can find details on the properties of a program at http://www.tvbrowser.org/dev/api/tvbrowser_v3.3.3/doc/devplugin/Program.html
 
 Extended text field entries can be accessed by giving the field name. Examples:
  * `{EPISODE_TYPE}` - returns the episode title
  * `{ORIGINAL_TITLE_TYPE}` - returns the original language episode title 
 
-You can find details on these extended text field properties of a program at http://tvbrowser.org:8080/hudson/job/tvbrowser-3-unstable/javadoc/devplugin/ProgramFieldType.html
+You can find details on these extended text field properties of a program at http://www.tvbrowser.org/dev/api/tvbrowser_v3.3.3/doc/devplugin/ProgramFieldType.html
 
 Invalid placeholders result in their literal name, e.g. `{invalid}` returns `"invalid"`. If a value is not present (`"null"`), an empty string will be used.
 
