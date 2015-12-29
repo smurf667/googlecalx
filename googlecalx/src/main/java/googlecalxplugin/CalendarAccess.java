@@ -283,6 +283,11 @@ public class CalendarAccess {
 						if (str != null) {
 							sb.append(str);
 						}
+					} else if (type.isRightFormat(ProgramFieldType.INT_FORMAT)) {
+						final String str = program.getIntFieldAsString(type);
+						if (str != null) {
+							sb.append(str);
+						}
 					} else {
 						sb.append(key);
 					}

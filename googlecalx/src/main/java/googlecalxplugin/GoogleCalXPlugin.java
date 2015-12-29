@@ -39,6 +39,7 @@ public class GoogleCalXPlugin extends Plugin {
 	protected static final String MSG_CALENDAR_ID = "calendarId";
 	protected static final String MSG_CALENDAR_TARGET = "exportTarget";
 	protected static final String MSG_SHOW_CALENDAR_ID = "showCalendarId";
+	protected static final String MSG_SHOW_EXPORT_SUCCESS = "showExportSuccess";
 	protected static final String MSG_NO_CALENDAR = "noCalendar";
 	protected static final String MSG_NOTIFICATION_TIME = "notificationTime";
 	protected static final String MSG_NOTIFICATION_TYPE = "notificationType";
@@ -82,6 +83,7 @@ public class GoogleCalXPlugin extends Plugin {
 			try {
 				props.load(GoogleCalXPlugin.class.getResourceAsStream("/META-INF/maven/de.engehausen/googlecalx/pom.properties"));
 				final String pomVersion = props.getProperty("version");
+				stable = !pomVersion.contains("SNAPSHOT");
 				final StringTokenizer tok = new StringTokenizer(pomVersion, ".");
 				int i = 0;
 				while (i < 3 && tok.hasMoreTokens()) {
@@ -89,7 +91,6 @@ public class GoogleCalXPlugin extends Plugin {
 					final int cut = str.indexOf('-');
 					if (cut > 0) {
 						vs[i++] = Integer.parseInt(str.substring(0, cut));
-						stable = !pomVersion.contains("SNAPSHOT");
 						break;
 					} else {
 						vs[i++] = Integer.parseInt(str);
@@ -152,7 +153,7 @@ public class GoogleCalXPlugin extends Plugin {
 					program.unmark(plugin);
 				}
 			});
-		} else {
+		} else if (program.getUniqueID() != null) { // circumvent issue in 3.4.2 - see http://hilfe.tvbrowser.org/viewtopic.php?f=42&t=17003&p=113370
 			Action action = actionsCache.get(program);
 			if (action == null) {
 				final String calendarId = settings.getCalendarId();
@@ -172,6 +173,8 @@ public class GoogleCalXPlugin extends Plugin {
 				}
 			}
 			return new ActionMenu(action);
+		} else {
+			return null;
 		}
 	}
 
@@ -298,7 +301,13 @@ public class GoogleCalXPlugin extends Plugin {
 									plugin.calendarAccess.createEvent(program)
 									);
 							program.mark(plugin);
-							JOptionPane.showMessageDialog(plugin.getParentFrame(), localizer.msg(MSG_EXPORT_OK, "Export to calendar was successful."), localizer.msg(MSG_SUCCESS, "Success!"), JOptionPane.INFORMATION_MESSAGE);
+							if (plugin.settings.getShowExportSuccess()) {
+								JOptionPane.showMessageDialog(
+									plugin.getParentFrame(),
+									localizer.msg(MSG_EXPORT_OK, "Export to calendar was successful."),
+									localizer.msg(MSG_SUCCESS, "Success!"),
+									JOptionPane.INFORMATION_MESSAGE);
+							}
 						} catch (IOException ex) {
 							ErrorHandler.handle(localizer.msg(MSG_ERROR, "Service call error"), ex);
 						}

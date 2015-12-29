@@ -21,6 +21,7 @@ public class GoogleCalXSettings extends PropertyBasedSettings {
 	private static final String PROP_NOTIFICATION_COLOR = "ncolor";
 	private static final String PROP_NOTIFICATION_TITLE = "ntitle";
 	private static final String PROP_NOTIFICATION_BODY = "nbody";
+	private static final String PROP_SHOW_EXPORT_SUCCESS = "showSuccess";
 	
 	private final Map<String, CalendarColor> colorCache = new WeakHashMap<String, CalendarColor>();
 
@@ -182,6 +183,24 @@ public class GoogleCalXSettings extends PropertyBasedSettings {
 	 */
 	public void setNotificationColor(final CalendarColor color) {
 		set(PROP_NOTIFICATION_COLOR, color.toString());
+	}
+
+	/**
+	 * Indicates whether or not to show a success message after
+	 * an export.
+	 * @return <code>true</code> if a success message is to be shown.
+	 */
+	public boolean getShowExportSuccess() {
+		return Boolean.parseBoolean(get(PROP_SHOW_EXPORT_SUCCESS, Boolean.toString(true)));
+	}
+
+	/**
+	 * Sets whether or not to show a success message after
+	 * an export.
+	 * @param flag <code>true</code> if a success message is to be shown.
+	 */
+	public void setShowExportSuccess(final boolean flag) {
+		set(PROP_SHOW_EXPORT_SUCCESS, Boolean.toString(flag));
 	}
 
 }

@@ -22,15 +22,14 @@ import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
-import util.exc.ErrorHandler;
-import util.ui.EnhancedPanelBuilder;
-import util.ui.Localizer;
-
 import com.google.api.services.calendar.model.ColorDefinition;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormSpecs;
 
 import devplugin.SettingsTab;
+import util.exc.ErrorHandler;
+import util.ui.EnhancedPanelBuilder;
+import util.ui.Localizer;
 
 /**
  * UI layer for the settings of the plugin.
@@ -45,6 +44,7 @@ public class GoogleCalXPreferences implements SettingsTab, ActionListener {
 	private JTextField fieldCalendarId;
 	private CalendarTargetField fieldCalendarTarget;
 	private JCheckBox fieldShowCalendarId;
+	private JCheckBox fieldShowExportSuccess;
 	private JTextField fieldNotificationTime;
 	private JTextField fieldNotificationTitle;
 	private JTextField fieldNotificationBody;
@@ -119,6 +119,12 @@ public class GoogleCalXPreferences implements SettingsTab, ActionListener {
 		pb.addLabel(localizer.msg(GoogleCalXPlugin.MSG_SHOW_CALENDAR_ID, "Show ID in export action") + ':', cc.xy(2, pb.getRow()));
 		pb.add(fieldShowCalendarId, cc.xyw(4, pb.getRow(), pb.getColumnCount() - 3));
 
+		fieldShowExportSuccess = new JCheckBox();
+		fieldShowExportSuccess.setSelected(plugin.settings.getShowExportSuccess());
+		pb.addRow();
+		pb.addLabel(localizer.msg(GoogleCalXPlugin.MSG_SHOW_EXPORT_SUCCESS, "Show success message after export") + ':', cc.xy(2, pb.getRow()));
+		pb.add(fieldShowExportSuccess, cc.xyw(4, pb.getRow(), pb.getColumnCount() - 3));
+
 		fieldNotificationTitle = new JTextField(plugin.settings.getNotificationTitle());
 		pb.addRow();
 		pb.addLabel(localizer.msg(GoogleCalXPlugin.MSG_NOTIFICATION_TITLE, "Notification title") + ':', cc.xy(2, pb.getRow()));
@@ -190,6 +196,7 @@ public class GoogleCalXPreferences implements SettingsTab, ActionListener {
 		plugin.settings.setCalendarId(fieldCalendarId.getText());
 		plugin.settings.setCalendarTarget(fieldCalendarTarget.getCalendarTarget());
 		plugin.settings.setShowCalendarId(fieldShowCalendarId.isSelected());
+		plugin.settings.setShowExportSuccess(fieldShowExportSuccess.isSelected());
 		plugin.settings.setNotificationTitle(fieldNotificationTitle.getText());
 		plugin.settings.setNotificationBody(fieldNotificationBody.getText());
 		plugin.settings.setNotificationType((NotificationTypes) fieldNotificationType.getSelectedItem());
