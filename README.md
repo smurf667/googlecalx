@@ -41,3 +41,11 @@ Invalid placeholders result in their literal name, e.g. `{invalid}` returns `"in
 
 ### Reminders
 You can choose between having no reminder at all, using your calendar's defaults for reminders, or set a specific type (email, popup, sms), time and color for the entry.
+
+# FAQ
+
+## Export does not work any more
+If you get an error message which indicates an `invalid_token` maybe something went wrong with your credentials. These are stored locally with the extension, and may expire or you may have changed you password for Google etc.
+
+Recommended solution: Delete the file `StoredCredentials` in `%userprofile%\AppData\Roaming\TV-Browser\<TV-Browser-version>\.store\googlecalx` and restart TV-Browser. Using the calendar export should prompt for your login credentials again.
+This question has been asked (in German) in the TV-Browser forum at https://hilfe.tvbrowser.org/viewtopic.php?t=17003&start=105#p109952
