@@ -1,9 +1,0 @@
-PRIVACY POLICY
-- for OAuth consent screen -
-
-This extension for TV Browser (https://www.tvbrowser.org/) does not collect
-private information, but requires your credentials to access the Google
-Calendar API in order to export TV listing entries into your Google calendar.
-The credentials will be stored on your local harddisk only.
-
-All details on the extension can be found at https://github.com/smurf667/googlecalx
