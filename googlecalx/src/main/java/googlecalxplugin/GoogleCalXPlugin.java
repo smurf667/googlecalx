@@ -60,11 +60,12 @@ public class GoogleCalXPlugin extends Plugin {
 	protected static final String MSG_CLEAR_CREDENTIALS = "clearCreds";
 	protected static final String MSG_CREDENTIALS = "creds";
 	protected static final String MSG_R_U_SURE = "sure";
-	
+
 	private static final Localizer localizer = Localizer.getLocalizerFor(GoogleCalXPlugin.class);
 	private static PluginInfo pluginInfo;
 	protected static final String PLUGIN_ID = "googlecalx";
-	
+	protected static final String GOOGLE_APPLICATION_ID = "gcalx";
+
 	private final Map<Program, ExportAction> actionsCache;
 	private final ImageIcon exportIcon;
 	private final ProgramReceiveTarget exportReceiveTarget;
@@ -113,7 +114,7 @@ public class GoogleCalXPlugin extends Plugin {
 		exportIcon = createImageIcon("apps", "office-calendar");
 		exportReceiveTarget = new ProgramReceiveTarget(this, localizer.msg(MSG_PLUGIN_NAME, "Google calendar export"), "googleCalX");
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -121,9 +122,9 @@ public class GoogleCalXPlugin extends Plugin {
 	public PluginInfo getInfo() {
 		if (pluginInfo == null) {
 			pluginInfo = new PluginInfo(
-					GoogleCalXPlugin.class, 
+					GoogleCalXPlugin.class,
 					localizer.msg(MSG_PLUGIN_NAME, "Google calendar export"),
-					localizer.msg(MSG_PLUGIN_DESCRIPTION, "Exports a program into your Google calendar."), 
+					localizer.msg(MSG_PLUGIN_DESCRIPTION, "Exports a program into your Google calendar."),
 					"Jan Engehausen, smurf667@gmail.com",
 					"Apache License, Version 2.0",
 					"https://code.google.com/p/googlecalx/wiki/SettingsHowTo");
@@ -278,12 +279,12 @@ public class GoogleCalXPlugin extends Plugin {
 	 * Action to export a program.
 	 */
 	private static class ExportAction extends AbstractAction {
-		
+
 		private static final long serialVersionUID = 1L;
 
 		private final Program program;
 		private final GoogleCalXPlugin plugin;
-		
+
 		protected ExportAction(final Program prog, final GoogleCalXPlugin parent) {
 			super(getLabel(parent.settings));
 			program = prog;

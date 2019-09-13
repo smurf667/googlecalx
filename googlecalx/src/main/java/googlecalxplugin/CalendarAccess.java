@@ -231,23 +231,23 @@ public class CalendarAccess {
 				throw new IllegalStateException();
 			}
 			final GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(
-					jsonFactory, 
-					new InputStreamReader(zis));
+				jsonFactory, 
+				new InputStreamReader(zis));
 			if (clientSecrets.getDetails().getClientId().startsWith(STR_ENTER)
 					|| clientSecrets.getDetails().getClientSecret().startsWith(STR_ENTER)) {
 				throw new IllegalStateException("Client secrets unavailable or invalid");
 			}
 			
 			final GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
-					httpTransport,
-					jsonFactory,
-					clientSecrets,
-					Collections.singleton(CalendarScopes.CALENDAR)).setDataStoreFactory(fileDataStoreFactory).build();
+				httpTransport,
+				jsonFactory,
+				clientSecrets,
+				Collections.singleton(CalendarScopes.CALENDAR_EVENTS)).setDataStoreFactory(fileDataStoreFactory).build();
 			final Credential credential = new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
 			client = new Calendar.Builder(
-					httpTransport, 
-					jsonFactory, 
-					credential).setApplicationName(GoogleCalXPlugin.PLUGIN_ID).build();
+				httpTransport, 
+				jsonFactory, 
+				credential).setApplicationName(GoogleCalXPlugin.GOOGLE_APPLICATION_ID).build();
 			if (client == null) {
 				throw new IllegalStateException("Cannot build client");
 			}
