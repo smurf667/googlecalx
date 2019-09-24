@@ -52,4 +52,4 @@ This question has been asked (in German) in the TV-Browser forum at https://hilf
 
 ## What has changed in this release?
 
-Please refer to the [changes document](../blob/master/CHANGES.md).
+Please refer to the [changes document](CHANGES.md).
