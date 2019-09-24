@@ -7,6 +7,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -242,7 +243,8 @@ public class CalendarAccess {
 				httpTransport,
 				jsonFactory,
 				clientSecrets,
-				Collections.singleton(CalendarScopes.CALENDAR_EVENTS)).setDataStoreFactory(fileDataStoreFactory).build();
+				Arrays.asList(CalendarScopes.CALENDAR_EVENTS, CalendarScopes.CALENDAR_READONLY)
+				).setDataStoreFactory(fileDataStoreFactory).build();
 			final Credential credential = new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
 			client = new Calendar.Builder(
 				httpTransport, 

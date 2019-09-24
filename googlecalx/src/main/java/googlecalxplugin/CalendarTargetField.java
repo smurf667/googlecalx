@@ -12,7 +12,7 @@ public class CalendarTargetField extends JTextField {
 	private CalendarTarget target;
 
 	public CalendarTargetField(final CalendarTarget aTarget) {
-		super(aTarget.getLabel(), 40);
+		super(aTarget.getLabel(), 24);
 		setEnabled(false);
 	}
 	

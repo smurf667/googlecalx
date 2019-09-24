@@ -294,24 +294,21 @@ public class GoogleCalXPlugin extends Plugin {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 			if (plugin.calendarAccess != null) {
-				SwingUtilities.invokeLater(new Runnable() {
-					@Override
-					public void run() {
-						try {
-							plugin.calendarAccess.addEvent(
-									plugin.calendarAccess.createEvent(program)
-									);
-							program.mark(plugin);
-							if (plugin.settings.getShowExportSuccess()) {
-								JOptionPane.showMessageDialog(
-									plugin.getParentFrame(),
-									localizer.msg(MSG_EXPORT_OK, "Export to calendar was successful."),
-									localizer.msg(MSG_SUCCESS, "Success!"),
-									JOptionPane.INFORMATION_MESSAGE);
-							}
-						} catch (IOException ex) {
-							ErrorHandler.handle(localizer.msg(MSG_ERROR, "Service call error"), ex);
+				SwingUtilities.invokeLater(() -> {
+					try {
+						plugin.calendarAccess.addEvent(
+							plugin.calendarAccess.createEvent(program)
+						);
+						program.mark(plugin);
+						if (plugin.settings.getShowExportSuccess()) {
+							JOptionPane.showMessageDialog(
+								plugin.getParentFrame(),
+								localizer.msg(MSG_EXPORT_OK, "Export to calendar was successful."),
+								localizer.msg(MSG_SUCCESS, "Success!"),
+								JOptionPane.INFORMATION_MESSAGE);
 						}
+					} catch (IOException ex) {
+						ErrorHandler.handle(localizer.msg(MSG_ERROR, "Service call error"), ex);
 					}
 				});
 			}

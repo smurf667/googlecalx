@@ -218,41 +218,37 @@ public class GoogleCalXPreferences implements SettingsTab, ActionListener {
 				calendarAccess.deleteCredentials();
 			}
 		} else if (source == pickCalendarTarget) {
-			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-					try {
-						final List<CalendarTarget> targets = calendarAccess.getCalendarTargets();
-						if (targets.size() > 0) {
-							final CalendarTarget[] possibleValues = targets.toArray(new CalendarTarget[targets.size()]);
-							final Object selectedValue = JOptionPane.showInputDialog(
-									parent,
-									localizer.msg(GoogleCalXPlugin.MSG_CHOOSE_CALENDAR, "Choose calendar"),
-									localizer.msg(GoogleCalXPlugin.MSG_SELECT, "select"),
-									JOptionPane.INFORMATION_MESSAGE,
-									null,
-									possibleValues, possibleValues[0]);
-							if (selectedValue != null) {
-								fieldCalendarTarget.setCalendarTarget((CalendarTarget) selectedValue);
-							}
+			SwingUtilities.invokeLater(() -> {
+				try {
+					final List<CalendarTarget> targets = calendarAccess.getCalendarTargets();
+					if (targets.size() > 0) {
+						final CalendarTarget[] possibleValues = targets.toArray(new CalendarTarget[targets.size()]);
+						final Object selectedValue = JOptionPane.showInputDialog(
+								parent,
+								localizer.msg(GoogleCalXPlugin.MSG_CHOOSE_CALENDAR, "Choose calendar"),
+								localizer.msg(GoogleCalXPlugin.MSG_SELECT, "select"),
+								JOptionPane.INFORMATION_MESSAGE,
+								null,
+								possibleValues, possibleValues[0]);
+						if (selectedValue != null) {
+							fieldCalendarTarget.setCalendarTarget((CalendarTarget) selectedValue);
 						}
-					} catch (IOException ex) {
-						ErrorHandler.handle(localizer.msg(GoogleCalXPlugin.MSG_ERROR, "Service call error"), ex);
 					}
+				} catch (IOException ex) {
+					ErrorHandler.handle(localizer.msg(GoogleCalXPlugin.MSG_ERROR, "Service call error"), ex);
 				}
 			});
 		} else if (source == pickNotificationColor) {
-			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-					try {
-						final List<CalendarColor> colors = new ArrayList<CalendarColor>();
-						for (Map.Entry<String, ColorDefinition> entry : calendarAccess.getCalendarColors()) {
-							colors.add(new CalendarColor(entry.getKey(), entry.getValue()));
-						}
-						Collections.sort(colors);
-						notificationColor.setColor(NotificationColor.pickColor(parent, localizer.msg(GoogleCalXPlugin.MSG_CHOOSE_COLOR, "Choose color"), colors));
-					} catch (IOException ex) {
-						ErrorHandler.handle(localizer.msg(GoogleCalXPlugin.MSG_ERROR, "Service call error"), ex);
+			SwingUtilities.invokeLater(() -> {
+				try {
+					final List<CalendarColor> colors = new ArrayList<CalendarColor>();
+					for (Map.Entry<String, ColorDefinition> entry : calendarAccess.getCalendarColors()) {
+						colors.add(new CalendarColor(entry.getKey(), entry.getValue()));
 					}
+					Collections.sort(colors);
+					notificationColor.setColor(NotificationColor.pickColor(parent, localizer.msg(GoogleCalXPlugin.MSG_CHOOSE_COLOR, "Choose color"), colors));
+				} catch (IOException ex) {
+					ErrorHandler.handle(localizer.msg(GoogleCalXPlugin.MSG_ERROR, "Service call error"), ex);
 				}
 			});
 		}
