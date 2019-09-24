@@ -49,3 +49,7 @@ If you get an error message which indicates an `invalid_token` maybe something w
 
 Recommended solution: Delete the file `StoredCredentials` in `%userprofile%\AppData\Roaming\TV-Browser\<TV-Browser-version>\.store\googlecalx` and restart TV-Browser. Using the calendar export should prompt for your login credentials again.
 This question has been asked (in German) in the TV-Browser forum at https://hilfe.tvbrowser.org/viewtopic.php?t=17003&start=105#p109952
+
+## What has changed in this release?
+
+Please refer to the [changes document](CHANGES.md).

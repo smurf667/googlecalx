@@ -5,7 +5,7 @@
 	<groupId>de.engehausen</groupId>
 	<artifactId>googlecalx</artifactId>
 	<packaging>jar</packaging>
-	<version>1.2.0-SNAPSHOT</version>
+	<version>1.2.0</version>
 	<name>googlecalx</name>
 	<url>https://github.com/smurf667/googlecalx</url>
 	<description>Plugin for TV-Browser (https://www.tvbrowser.org/) to export programs to Google Calendar.</description>
@@ -30,10 +30,9 @@
 	</licenses>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
 	</properties>
-	<prerequisites>
-		<maven>3.0.5</maven>
-	</prerequisites>
 	<repositories>
 		<repository>
 			<id>tvbrowser-maven-repository</id>
@@ -78,24 +77,16 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.2</version>
+					<version>3.8.1</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-assembly-plugin</artifactId>
-					<version>2.5.3</version>
+					<version>3.1.1</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
 		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-				</configuration>
-			</plugin>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<executions>
