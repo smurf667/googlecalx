@@ -5,7 +5,7 @@
 	<groupId>de.engehausen</groupId>
 	<artifactId>googlecalx</artifactId>
 	<packaging>jar</packaging>
-	<version>1.2.0</version>
+	<version>1.3.0</version>
 	<name>googlecalx</name>
 	<url>https://github.com/smurf667/googlecalx</url>
 	<description>Plugin for TV-Browser (https://www.tvbrowser.org/) to export programs to Google Calendar.</description>
@@ -30,8 +30,7 @@
 	</licenses>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
+		<maven.compiler.release>17</maven.compiler.release>
 	</properties>
 	<repositories>
 		<repository>
@@ -43,19 +42,25 @@
 		<dependency>
 			<groupId>org.tvbrowser</groupId>
 			<artifactId>tvbrowser</artifactId>
-			<version>3.4.1.0</version>
+			<version>4.2.4</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.jgoodies</groupId>
+			<artifactId>jgoodies-forms</artifactId>
+			<version>1.6.0</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.google.apis</groupId>
 			<artifactId>google-api-services-calendar</artifactId>
-			<version>v3-rev379-1.25.0</version>
+			<version>v3-rev411-1.25.0</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.google.http-client</groupId>
 			<artifactId>google-http-client-jackson2</artifactId>
-			<version>1.19.0</version>
+			<version>1.47.0</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
@@ -67,7 +72,7 @@
 		<dependency>
 			<groupId>commons-beanutils</groupId>
 			<artifactId>commons-beanutils</artifactId>
-			<version>1.9.4</version>
+			<version>1.11.0</version>
 			<scope>compile</scope>
 		</dependency>
 	</dependencies>
@@ -77,12 +82,12 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.8.1</version>
+					<version>3.14.0</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-assembly-plugin</artifactId>
-					<version>3.1.1</version>
+					<version>3.7.1</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>

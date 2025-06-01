@@ -99,7 +99,7 @@ public class CalendarAccess {
 		this.settings = settings;
 		final File dataStoreDirectory = new File(directory, ".store/"+GoogleCalXPlugin.PLUGIN_ID);
 		fileDataStoreFactory = new FileDataStoreFactory(dataStoreDirectory);
-		jsonFactory = factory!=null?factory:JacksonFactory.getDefaultInstance();
+		jsonFactory = (factory != null) ? factory : JacksonFactory.getDefaultInstance();
 		httpTransport = GoogleNetHttpTransport.newTrustedTransport();
 	}
 	
@@ -280,12 +280,12 @@ public class CalendarAccess {
 			if (key.endsWith("_TYPE")) {
 				final ProgramFieldType type = STR2PFT.get(key);
 				if (type != null) {
-					if (type.isRightFormat(ProgramFieldType.TEXT_FORMAT)) {
+					if (type.isRightFormat(ProgramFieldType.FORMAT_TEXT)) {
 						final String str = program.getTextField(type);
 						if (str != null) {
 							sb.append(str);
 						}
-					} else if (type.isRightFormat(ProgramFieldType.INT_FORMAT)) {
+					} else if (type.isRightFormat(ProgramFieldType.FORMAT_INT)) {
 						final String str = program.getIntFieldAsString(type);
 						if (str != null) {
 							sb.append(str);
