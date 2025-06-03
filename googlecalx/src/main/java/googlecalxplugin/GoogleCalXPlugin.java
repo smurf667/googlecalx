@@ -69,7 +69,7 @@ public class GoogleCalXPlugin extends Plugin {
 	private final Map<Program, ExportAction> actionsCache;
 	private final ImageIcon exportIcon;
 	private final ProgramReceiveTarget exportReceiveTarget;
-	protected GoogleCalXSettings settings;
+	protected GoogleCalXSettings settings = new GoogleCalXSettings(new Properties());
 	protected CalendarAccess calendarAccess;
 
 	/**
@@ -127,7 +127,7 @@ public class GoogleCalXPlugin extends Plugin {
 					localizer.msg(MSG_PLUGIN_DESCRIPTION, "Exports a program into your Google calendar."),
 					"Jan Engehausen, smurf667@gmail.com",
 					"Apache License, Version 2.0",
-					"https://code.google.com/p/googlecalx/wiki/SettingsHowTo");
+					"https://github.com/smurf667/googlecalx?tab=readme-ov-file#accessing-the-settings");
 		}
 		return pluginInfo;
 	}
